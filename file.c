@@ -102,7 +102,7 @@ static ssize_t osfs_write(struct file *filp, const char __user *buf, size_t len,
         inode->i_size = *ppos;  // update size for VFS
     }
 
-    mark_inode_dirty(inode); // Mark the inode as dirty to ensure updates are written to disk
+    //mark_inode_dirty(inode); // Mark the inode as dirty to ensure updates are written to disk
 
     pr_info("osfs_write: Wrote %zu bytes to file inode %lu at position %lld\n",
             len, inode->i_ino, *ppos);

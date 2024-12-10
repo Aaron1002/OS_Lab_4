@@ -301,7 +301,7 @@ static int osfs_create(struct mnt_idmap *idmap, struct inode *dir, struct dentry
 
     // Step 5: Update the parent directory's metadata 
     parent_inode->i_size += sizeof(struct osfs_dir_entry);  // ensure the size of the inode is correct
-    mark_inode_dirty(dir);  // marks the inode as dirty(modified)
+    //mark_inode_dirty(dir);  // marks the inode as dirty(modified)
 
     // Step 6: Bind the inode to the VFS dentry
     d_instantiate(dentry, inode);   // associates a dentry with an inode in the VFS layer
