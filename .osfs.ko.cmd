@@ -1,0 +1,1 @@
+savedcmd_/home/aaron/Downloads/os_2024_lab4_template/osfs.ko := ld -r -m elf_x86_64 -z noexecstack --build-id=sha1  -T scripts/module.lds -o /home/aaron/Downloads/os_2024_lab4_template/osfs.ko /home/aaron/Downloads/os_2024_lab4_template/osfs.o /home/aaron/Downloads/os_2024_lab4_template/osfs.mod.o

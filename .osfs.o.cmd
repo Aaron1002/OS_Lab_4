@@ -1,0 +1,1 @@
+savedcmd_/home/aaron/Downloads/os_2024_lab4_template/osfs.o := ld -m elf_x86_64 -z noexecstack   -r -o /home/aaron/Downloads/os_2024_lab4_template/osfs.o @/home/aaron/Downloads/os_2024_lab4_template/osfs.mod 

@@ -110,9 +110,9 @@ int osfs_alloc_data_block(struct osfs_sb_info *sb_info, uint32_t *block_no)
     uint32_t i;
 
     for (i = 0; i < sb_info->block_count; i++) {
-        if (!test_bit(i, sb_info->block_bitmap)) {
-            set_bit(i, sb_info->block_bitmap);
-            sb_info->nr_free_blocks--;
+        if (!test_bit(i, sb_info->block_bitmap)) {  // test if the block is occupied
+            set_bit(i, sb_info->block_bitmap);  // allocate the data block
+            sb_info->nr_free_blocks--;  // number of free block - 1
             *block_no = i;
             return 0;
         }

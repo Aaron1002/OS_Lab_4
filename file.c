@@ -60,26 +60,26 @@ static ssize_t osfs_read(struct file *filp, char __user *buf, size_t len, loff_t
 static ssize_t osfs_write(struct file *filp, const char __user *buf, size_t len, loff_t *ppos)
 {   
     //Step1: Retrieve the inode and filesystem information
-    struct inode *inode = file_inode(filp);
+    struct inode *inode = file_inode(filp); // access inode from opened data
     struct osfs_inode *osfs_inode = inode->i_private;
-    struct osfs_sb_info *sb_info = inode->i_sb->s_fs_info;
-    void *data_block;
+    struct osfs_sb_info *sb_info = inode->i_sb->s_fs_info;  // access superblock info
+    void *data_block;   
     ssize_t bytes_written;
     int ret;
 
     // Step2: Check if a data block has been allocated; if not, allocate one
-    if (osfs_inode->i_blocks == 0) {
-        ret = osfs_alloc_data_block(sb_info, &osfs_inode->i_blocks);
+    if (osfs_inode->i_blocks == 0) {    // if there has been a block allocated (traverse if there is any block can be allocated)
+        ret = osfs_alloc_data_block(sb_info, &osfs_inode->i_blocks);    // return 0 means allocation sucess
         if (ret) {
             pr_err("osfs_write: Failed to allocate data block\n");
             return ret;
         }
-        osfs_inode->i_size = 0; // Initialize file size
+        osfs_inode->i_size = 0; // Initialize(reset) file size(because the file was allocated)
     }
 
     // Step3: Limit the write length to fit within one data block
-    if (*ppos + len > BLOCK_SIZE) {
-        len = BLOCK_SIZE - *ppos;
+    if (*ppos + len > BLOCK_SIZE) { // if the length exceed the BlockSize
+        len = BLOCK_SIZE - *ppos;   // only write the data fit in the data block 
     }
 
     if (len == 0) {
@@ -87,19 +87,19 @@ static ssize_t osfs_write(struct file *filp, const char __user *buf, size_t len,
     }
 
     // Step4: Write data from user space to the data block
-    data_block = sb_info->data_blocks + osfs_inode->i_blocks * BLOCK_SIZE + *ppos;
-    if (copy_from_user(data_block, buf, len)) {
+    data_block = sb_info->data_blocks + osfs_inode->i_blocks * BLOCK_SIZE + *ppos;  // move to the start position to write
+    if (copy_from_user(data_block, buf, len)) { // wite data from user space to data block
         pr_err("osfs_write: Failed to copy data from user space\n");
         return -EFAULT;
     }
 
     // Step5: Update inode & osfs_inode attribute
-    *ppos += len;
+    *ppos += len;   // update the offset
     bytes_written = len;
 
-    if (*ppos > osfs_inode->i_size) {
-        osfs_inode->i_size = *ppos;
-        inode->i_size = *ppos;
+    if (*ppos > osfs_inode->i_size) {   // inode->file_size not fit offset
+        osfs_inode->i_size = *ppos; // ensure the file size fits the offset
+        inode->i_size = *ppos;  // update size for VFS
     }
 
     mark_inode_dirty(inode); // Mark the inode as dirty to ensure updates are written to disk
